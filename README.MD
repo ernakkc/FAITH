@@ -1,16 +1,16 @@
 # FAITH Takımının Online Yarışma Sürecinde Kullanacağı GitHub Reposu
 
-Bundan sonraki sürece iş bölümü şeklinde devam edeceğiz. 
-Ali Kemal - Arif Tuna   --> Object Detection
-Eren      - Mehmet Akif --> Lokasyon
+Bundan sonraki sürece iş bölümü şeklinde devam edeceğiz. </br>
+Ali Kemal - Arif Tuna   --> Object Detection </br>
+Eren      - Mehmet Akif --> Lokasyon 
 
 
 3 Farklı Branch olacak:
-- Master
-- Location
-- ObjDet
+- main
+- location
+- objdet
 
-Dosyalar üzerinde kendi branch'ınızda değişiklik yapıp commit atarsınız. 
+Dosyalar üzerinde kendi branch'ınızda değişiklik yapıp commit atarsınız. </br>
 Son halini aldığında yada çakışma olmadığında main branch'le marge edip devam edilir.
 
 
