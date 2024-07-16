@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.pyo
+
+data/best.pt
+
+_logs/
+_images/
+
+frames.json
+translations.json
+
+.venv/
+
+*.pt

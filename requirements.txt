@@ -1,0 +1,8 @@
+python-decouple
+requests~=2.25.1
+pillow~=8.2.0 # for Installatinon Error:  sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev 
+tqdm
+opencv-python
+yolov5
+sahi
+filterpy
