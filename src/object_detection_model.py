@@ -85,7 +85,6 @@ class ObjectDetectionModel:
             elif cls == 0:                new_cls = 1   # İnsan
             elif cls == 6:                new_cls = 2   # UAP
             elif cls == 7:                new_cls = 3   # UAI
-            else:                         new_cls = -1  # Hiçbiri
             
             detected_objects.append({
                 "box": box,
@@ -144,6 +143,8 @@ class ObjectDetectionModel:
                             status = "Inilemez"
                             
                     cv2.putText(image, str(status), (int(box[0]), int(box[1]) - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)  
+
+                cls = classes["UAP"] # Buraya dikkat yarışma bizden bu tarzda veriyi istiyor.
             
             elif class_id == 3: # UAI ise
                 roi = image[int(box[1]):int(box[3]), int(box[0]):int(box[2])]
@@ -192,6 +193,9 @@ class ObjectDetectionModel:
                             status = "Inilemez"
                             
                     cv2.putText(image, str(status), (int(box[0]), int(box[1]) - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                    
+                cls = classes["UAI"] # Buraya dikkat yarışma bizden bu tarzda veriyi istiyor.
+                
             else:
                 cv2.rectangle(image, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 2)
                 cv2.putText(image, label, (int(box[0]), int(box[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
@@ -199,9 +203,9 @@ class ObjectDetectionModel:
                 cv2.putText(image, str(status), (int(box[0]), int(box[1]) - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
                 if class_id == 0:
-                    cls = classes["Tasit"]
+                    cls = classes["Tasit"] # Buraya dikkat yarışma bizden bu tarzda veriyi istiyor.
                 elif class_id == 1:
-                    cls = classes["Insan"]
+                    cls = classes["Insan"] # Buraya dikkat yarışma bizden bu tarzda veriyi istiyor.
 
             landing_status = landing_statuses[status]
             top_left_x = box[0]
