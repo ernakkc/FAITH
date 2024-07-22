@@ -22,6 +22,7 @@ class ObjectDetectionModel:
         self.last_frame = None
         self.detection_model = Detection(model_path="data/best.pt")
         self.location_predictor = LocationPredictor()
+        self.image_path = None
         
     @staticmethod
     def download_image(img_url, images_folder, images_files, retries=3, initial_wait_time=0.1):
@@ -42,7 +43,7 @@ class ObjectDetectionModel:
 
                         t2 = time.perf_counter()
                         logging.info(f'{img_url} - Download Finished in {t2 - t1} seconds to {images_folder + image_name}')
-                        return
+                        return 
 
                     except requests.exceptions.RequestException as e:
                         logging.error(f"Download failed for {img_url} on attempt {attempt + 1}: {e}")
@@ -54,11 +55,10 @@ class ObjectDetectionModel:
         else:
             logging.info(f'{image_name} already exists in {images_folder}, skipping download.')
 
-
     def process(self, prediction,evaluation_server_url,health_status, images_folder ,images_files):
         self.download_image(evaluation_server_url + "media" + prediction.image_url, images_folder, images_files)
         current_frame_path = images_folder + prediction.image_url.split("/")[-1]
-        if os.path.exists(current_frame_path): 
+        if cv2.imread(current_frame_path) is None:
             logging.error(f"Frame not found in {current_frame_path}")
             return None
                 

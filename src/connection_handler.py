@@ -297,6 +297,7 @@ class ConnectionHandler:
                     response_json = json.loads(response.text)
                     if "You do not have permission to perform this action." in response_json.get("detail", ""):
                         logging.info("Limit exceeded. 80frames/min \n\t{}".format(response.text))
+                        time.sleep(4)
                         return response
             except requests.exceptions.RequestException as e:
                 logging.error(f"Prediction request failed: {e}")

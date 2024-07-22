@@ -42,6 +42,7 @@ class Detection:
             device=device,
             load_at_init=load_at_init
         )
+        return DetectionModel
         
     def isLanding(self, class_id, frame, top_left_x, top_left_y, bottom_right_x, bottom_right_y):
         if class_id not in [2, 3]: return "-1" # İniş alanı değil
@@ -51,7 +52,7 @@ class Detection:
         if top_left_x <= margin or top_left_y <= margin or bottom_right_x >= frame.shape[1]-margin or bottom_right_y >= frame.shape[0]-margin: return "0"
         
         # Eğer UAP veya UAI'nin tamamı frame içerisindeyse
-        roi = frame[top_left_y:bottom_right_y, top_left_x:bottom_right_x]
+        roi = frame[int(top_left_y):int(bottom_right_y), int(top_left_x):int(bottom_right_x)]
         gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         blurred_roi = cv2.GaussianBlur(gray_roi, (15, 15), 0)
         circles = cv2.HoughCircles(blurred_roi, cv2.HOUGH_GRADIENT, dp=1.2, minDist=30, param1=50, param2=40, minRadius=50, maxRadius=100)
@@ -121,7 +122,6 @@ class Detection:
             
             box = object_prediction.bbox.to_xyxy()
             conf = object_prediction.score.value
-            label = f"{classes[new_cls]}"
             
             cls = new_cls
             top_left_x = box[0]
