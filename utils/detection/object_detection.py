@@ -8,8 +8,6 @@ from typing import List
 import pathlib
 import platform
 
-from src.constants import classes
-
 from sahi.utils.file import import_model_class
 from sahi.utils.cv import read_image_as_pil
 from sahi.prediction import ObjectPrediction
@@ -44,28 +42,58 @@ class Detection:
         )
         return DetectionModel
         
-    def isLanding(self, class_id, frame, top_left_x, top_left_y, bottom_right_x, bottom_right_y):
-        if class_id not in [2, 3]: return "-1" # İniş alanı değil
-        
-        # Eğer iniş alanının tamamı frame içerisinde değilse 0 (İnilemez) döndür
-        margin = 2 # Her kenarın boşluğu
-        if top_left_x <= margin or top_left_y <= margin or bottom_right_x >= frame.shape[1]-margin or bottom_right_y >= frame.shape[0]-margin: return "0"
-        
-        # Eğer UAP veya UAI'nin tamamı frame içerisindeyse
-        roi = frame[int(top_left_y):int(bottom_right_y), int(top_left_x):int(bottom_right_x)]
-        gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        blurred_roi = cv2.GaussianBlur(gray_roi, (15, 15), 0)
-        circles = cv2.HoughCircles(blurred_roi, cv2.HOUGH_GRADIENT, dp=1.2, minDist=30, param1=50, param2=40, minRadius=50, maxRadius=100)
-        
-        if circles is None: return "0"
-        if len(circles) > 0: return "1"
-        
-        #! BURAYI KESİNLİKLE TAMAMLAYIN NASIL OLMASI GEREKİYORSA
-            
-            
-            
-            
-    
+    def isLanding(self, class_id, frame, top_left_x, top_left_y, bottom_right_x, bottom_right_y,detected_objects,obj):
+        if class_id == 2:
+            roi = frame[int(top_left_y):int(bottom_right_y), int(top_left_x):int(bottom_right_x)]
+            gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            blurred_roi = cv2.GaussianBlur(gray_roi, (15, 15), 0)
+                
+            circles = cv2.HoughCircles(blurred_roi, cv2.HOUGH_GRADIENT, dp=1.2, minDist=30, param1=50, param2=40, minRadius=50, maxRadius=100)
+            if circles is not None:
+                status = "1"
+            else:
+                status = "0"
+                
+            if status != "0":
+                for other_obj in detected_objects:
+                    if other_obj == obj:
+                        status = "1"
+                        continue
+
+                    other_box = other_obj['box']
+                        
+                    if (top_left_x <= other_box[0] <= bottom_right_x and top_left_y <= other_box[1] <= bottom_right_y) and \
+                    (top_left_x <= other_box[2] <= bottom_right_x and top_left_y <= other_box[3] <= bottom_right_y):
+                        status = "0"  
+
+        elif class_id == 3:
+            roi = frame[int(top_left_y):int(bottom_right_y), int(top_left_x):int(bottom_right_x)]
+            gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            blurred_roi = cv2.GaussianBlur(gray_roi, (15, 15), 0)
+                
+            circles = cv2.HoughCircles(blurred_roi, cv2.HOUGH_GRADIENT, dp=1.2, minDist=30, param1=50, param2=40, minRadius=50, maxRadius=100)
+            if circles is not None:
+                status = "1"
+            else:
+                status = "0"
+                
+            if status != "0":
+                for other_obj in detected_objects:
+                    if other_obj == obj:
+                        status = "1"
+                        continue
+
+                    other_box = other_obj['box']
+                        
+                    if (top_left_x <= other_box[0] <= bottom_right_x and top_left_y <= other_box[1] <= bottom_right_y) and \
+                    (top_left_x <= other_box[2] <= bottom_right_x and top_left_y <= other_box[3] <= bottom_right_y):
+                        status = "0"  
+
+        else:
+            status = "-1"
+
+        return status
+
     
     def prediction(self, frame):
         detection_model = self.detection_model
@@ -108,6 +136,7 @@ class Detection:
         result = PredictionResult(image=frame, object_prediction_list=object_prediction_list, durations_in_seconds=durations_in_seconds)   
         object_prediction_list = result.object_prediction_list
         detected_objects = []
+        sended_objects = []
         
         for object_prediction in object_prediction_list:
             cls = object_prediction.category.id # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -116,26 +145,30 @@ class Detection:
             elif cls == 0:                new_cls = 1   # İnsan
             elif cls == 6:                new_cls = 2   # UAP
             elif cls == 7:                new_cls = 3   # UAI
-            else:                         
-                new_cls = random.randint(0, 3) # Hiçbiri
-                logging.warning(f"Unknown class id: {cls}")
-            
             box = object_prediction.bbox.to_xyxy()
-            conf = object_prediction.score.value
-            
-            cls = new_cls
+
+            detected_objects.append({
+                "box": box,
+                "class_id": new_cls
+            })
+
+        for obj in detected_objects:
+            box = obj["box"]
+            cls = obj["class_id"]
             top_left_x = box[0]
             top_left_y = box[1]
             bottom_right_x = box[2]
             bottom_right_y = box[3]
-            landing_status = self.isLanding(cls, frame, top_left_x, top_left_y, bottom_right_x, bottom_right_y)
+
+            landing_status = self.isLanding(cls,frame,top_left_x,top_left_y,bottom_right_x,bottom_right_y,detected_objects,obj)
             
-            detected_objects.append({
+            sended_objects.append({
                 "cls": cls,
                 "landing_status": landing_status,
                 "top_left_x": top_left_x,
                 "top_left_y": top_left_y,
                 "bottom_right_x": bottom_right_x,
                 "bottom_right_y": bottom_right_y
-            })
-        return detected_objects
+                                                        })
+            
+        return sended_objects
