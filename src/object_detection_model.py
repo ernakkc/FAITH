@@ -105,4 +105,6 @@ class ObjectDetectionModel:
         trans_obj = DetectedTranslation(pred_translation_x, pred_translation_y)
         prediction.add_translation_object(trans_obj)
 
+        self.last_frame = self.current_frame
+        
         return prediction
