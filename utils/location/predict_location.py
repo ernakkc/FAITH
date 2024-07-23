@@ -30,7 +30,7 @@ class LocationPredictor:
             return prediction.gt_translation_x, prediction.gt_translation_y
         
         # --> Veriler Sağlıksız İse <--
-        if last_frame == None: # İlk frame'de hareket yok
+        if last_frame is None: # İlk frame'de hareket yok
             return 0, 0
         
         current_frame_gray = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
